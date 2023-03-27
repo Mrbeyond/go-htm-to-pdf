@@ -59,7 +59,7 @@ RUN go build -o /build
 EXPOSE 8080
 
 # Run the executable
-# CMD [ "/build" ]
+# CMD [ "/build" ] 
 
 RUN go get github.com/githubnemo/CompileDaemon
 RUN go install -mod=mod github.com/githubnemo/CompileDaemon
