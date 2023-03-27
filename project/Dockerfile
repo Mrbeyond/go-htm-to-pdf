@@ -1,11 +1,13 @@
-
+### For htmltopdf 
 FROM surnet/alpine-wkhtmltopdf:3.16.2-0.12.6-full as wkhtmltopdf
 
 FROM golang:alpine
 
 LABEL maintainer="Mr Beyond"
 
-# Install dependencies for wkhtmltopdf
+
+
+### Install dependencies for wkhtmltopdf
 RUN apk add --no-cache \
     libstdc++ \
     libx11 \
@@ -30,9 +32,12 @@ RUN apk add --no-cache \
   && apk del .build-deps
 
 
-RUN mkdir /app
 
-RUN mkdir /pdfbin
+# Install git.
+# Git is required for fetching the dependencies.
+RUN apk update && apk add --no-cache git && apk add --no-cach bash && apk add build-base
+
+RUN mkdir /app
 
 WORKDIR /app
 
@@ -40,20 +45,8 @@ COPY . .
 
 COPY .env .
 
-
 # Copy wkhtmltopdf files from docker-wkhtmltopdf image
-# COPY --from=wkhtmltopdf /bin/wkhtmltopdf /bin/wkhtmltopdf
-
-
-# Copy wkhtmltopdf into bin for html to pdf 
-# binary manually copied from [surnet/alpine-wkhtmltopdf:3.16.2-0.12.6-full]
-# Binary copying the binary from a manually tried demo container 
-COPY ./alpine-wkhtmltopdf-binary/* /bin/
-
-
-RUN ls -la /bin
-
-# RUN wkhtmltopdf --version
+COPY --from=wkhtmltopdf /bin/wkhtmltopdf /bin/wkhtmltopdf
 
 RUN go get -d -v ./...
 
@@ -71,6 +64,6 @@ EXPOSE 8080
 RUN go get github.com/githubnemo/CompileDaemon
 RUN go install -mod=mod github.com/githubnemo/CompileDaemon
 
-# RUN go get -v golang.org/x/tools/gopls
+RUN go get -v golang.org/x/tools/gopls
 
 ENTRYPOINT CompileDaemon --build="go build -a -buildvcs=false -installsuffix cgo -o main ." --command="./main"
