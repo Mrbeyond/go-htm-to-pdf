@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: gohtmltopdf
+    tty: true
+    build: 
+      context: ./project
+    ports:
+      - "8073:8080"
+    restart: on-failure
+    volumes:
+      - ./project:/app
+    networks:
+      - pdf_net
+
+networks:
+  pdf_net:
+    driver: bridge
+
